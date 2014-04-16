@@ -52,7 +52,7 @@ enum {DHWorkSheetNotFound = UINT32_MAX};
 - (uint16_t)numberOfColsInSheet:(uint32_t)sheetIndex;
 
 // Random Access
-- (DHReaderCell *)cellInWorkSheetIndex:(uint32_t)sheetNum row:(uint16_t)row col:(uint16_t)col;		// uses 1 based indexing!
+- (DHReaderCell *)cellInWorkSheetIndex:(uint32_t)sheetNum row:(uint16_t)row col:(uint16_t)col;		
 - (DHReaderCell *)cellInWorkSheetIndex:(uint32_t)sheetNum row:(uint16_t)row colStr:(char *)col;		// "A"...."Z" "AA"..."ZZ"
 
 // Iterate through all cells

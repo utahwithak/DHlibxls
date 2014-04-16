@@ -166,12 +166,12 @@
 {
 	DHReaderCell *content = [DHReaderCell blankCell];
 	
-	assert(row && col);
+	//assert(row && col);
     
 	[self startIterator:DHWorkSheetNotFound];
 	[self openSheet:sheetNum];
 	
-	--row, --col;
+	//--row, --col;
 	
 	NSUInteger numRows = _activeWorkSheet->rows.lastrow + 1;
 	NSUInteger numCols = _activeWorkSheet->rows.lastcol + 1;
