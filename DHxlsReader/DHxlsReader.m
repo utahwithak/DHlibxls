@@ -6,17 +6,17 @@
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
- * 
+ *
  *    1. Redistributions of source code must retain the above copyright notice, this list of
  *       conditions and the following disclaimer.
- * 
+ *
  *    2. Redistributions in binary form must reproduce the above copyright notice, this list
  *       of conditions and the following disclaimer in the documentation and/or other materials
  *       provided with the distribution.
  *
  *    3. Only the ObjectiveC code is under this license - separate license may apply to libxls source.
  *       Read the documents and source headers in the libxls files which you downloaded earlier.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY David Hoerl ''AS IS'' AND ANY EXPRESS OR IMPLIED
  * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
  * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL David Hoerl OR
@@ -37,7 +37,7 @@
 #if ! __has_feature(objc_arc)
 #error THIS CODE MUST BE COMPILED WITH ARC ENABLED!
 #endif
- 
+
 
 @interface DHxlsReader ()
 
@@ -67,7 +67,7 @@
 {
 	DHxlsReader			*reader;
 	xlsWorkBook			*workBook;
-
+    
 	// NSLog(@"sizeof FORMULA=%zd LABELSST=%zd", sizeof(FORMULA), sizeof(LABELSST) );
 	const char *file = [filePath cStringUsingEncoding:NSUTF8StringEncoding];
 	if((workBook = xls_open(file, "UTF-8"))) {
@@ -135,18 +135,18 @@
 }
 
 - (void)openSheet:(uint32_t)sheetNum
-{	
+{
 	if(sheetNum >= _numSheets) {
 		_iterating = true;
 		_lastColIndex = UINT32_MAX;
 		_lastRowIndex = UINT32_MAX;
 	} else
-	if(sheetNum != _activeWorkSheetID) {
-		_activeWorkSheetID = sheetNum;
-		xls_close_WS(_activeWorkSheet);
-		_activeWorkSheet = xls_getWorkSheet(_workBook, sheetNum);
-		xls_parseWorkSheet(_activeWorkSheet);
-	}
+        if(sheetNum != _activeWorkSheetID) {
+            _activeWorkSheetID = sheetNum;
+            xls_close_WS(_activeWorkSheet);
+            _activeWorkSheet = xls_getWorkSheet(_workBook, sheetNum);
+            xls_parseWorkSheet(_activeWorkSheet);
+        }
 }
 
 - (uint16_t)numberOfRowsInSheet:(uint32_t)sheetIndex
@@ -167,7 +167,7 @@
 	DHReaderCell *content = [DHReaderCell blankCell];
 	
 	assert(row && col);
-
+    
 	[self startIterator:DHWorkSheetNotFound];
 	[self openSheet:sheetNum];
 	
@@ -175,7 +175,7 @@
 	
 	NSUInteger numRows = _activeWorkSheet->rows.lastrow + 1;
 	NSUInteger numCols = _activeWorkSheet->rows.lastcol + 1;
-
+    
 	for (NSUInteger t=0; t<numRows; t++)
 	{
 		xlsRow *rowP = &_activeWorkSheet->rows.row[t];
@@ -201,7 +201,7 @@
 - (DHReaderCell *)cellInWorkSheetIndex:(uint32_t)sheetNum row:(uint16_t)row colStr:(char *)colStr
 {
 	if(strlen(colStr) > 2 || strlen(colStr) == 0) return [DHReaderCell blankCell];
-
+    
 	NSInteger col = colStr[0] - 'A';
 	if(col < 0 || col >= 26) return [DHReaderCell blankCell];
 	char c = colStr[1];
@@ -212,7 +212,7 @@
 		col += col2;
 	}
 	col += 1;
-
+    
 	return [self cellInWorkSheetIndex:sheetNum row:row col:(uint16_t)col];
 }
 
@@ -232,12 +232,12 @@
 - (DHReaderCell *)nextCell
 {
 	DHReaderCell *content = [DHReaderCell blankCell];
-
+    
 	if(!_iterating) return nil;
 	
 	NSUInteger numRows = _activeWorkSheet->rows.lastrow + 1;
 	NSUInteger numCols = _activeWorkSheet->rows.lastcol + 1;
-
+    
 	if(_lastRowIndex >= numRows) return content;
 	
 	for (NSUInteger t=_lastRowIndex; t<numRows; t++)
@@ -262,7 +262,7 @@
 - (void)formatContent:(DHReaderCell *)content withCell:(xlsCell *)cell
 {
 	NSUInteger col = cell->col;
-
+    
 	content.row = cell->row + 1;
 	
 	{
@@ -278,44 +278,44 @@
 		colStr[2] = '\0';
 		[content setColStr:colStr];
 	}
-
+    
 	switch(cell->id) {
-    case 0x0006:	//FORMULA
-		// test for formula, if
-        if(cell->l == 0) {
-			content.type = cellFloat;
-			content.val = [NSNumber numberWithDouble:cell->d];
-		} else {
-			if(!strcmp((char *)cell->str, "bool")) {
-				BOOL b = (BOOL)cell->d;
-				content.type = cellBool;
-				content.val = [NSNumber numberWithBool:b];
-				content.str = b ? @"YES" : @"NO";
-			} else
-			if(!strcmp((char *)cell->str, "error")) {
-				// FIXME: Why do we convert the double cell->d to NSInteger?
-				NSInteger err = (NSInteger)cell->d;
-				content.type = cellError;
-				content.val = [NSNumber numberWithInteger:err];
-				content.str = [NSString stringWithFormat:@"%ld", (long)err];
-			} else {
-				content.type = cellString;
-			}
-		}
-        break;
-    case 0x00FD:	//LABELSST
-    case 0x0204:	//LABEL
-		content.type = cellString;
-		content.val = [NSNumber numberWithLong:cell->l];	// possible numeric conversion done for you
-		break;
-    case 0x0203:	//NUMBER
-    case 0x027E:	//RK
-		content.type = cellFloat;
-		content.val = [NSNumber numberWithDouble:cell->d];
-        break;
-    default:
-		content.type = cellUnknown;
-        break;
+        case 0x0006:	//FORMULA
+            // test for formula, if
+            if(cell->l == 0) {
+                content.type = cellFloat;
+                content.val = [NSNumber numberWithDouble:cell->d];
+            } else {
+                if(!strcmp((char *)cell->str, "bool")) {
+                    BOOL b = (BOOL)cell->d;
+                    content.type = cellBool;
+                    content.val = [NSNumber numberWithBool:b];
+                    content.str = b ? @"YES" : @"NO";
+                } else
+                    if(!strcmp((char *)cell->str, "error")) {
+                        // FIXME: Why do we convert the double cell->d to NSInteger?
+                        NSInteger err = (NSInteger)cell->d;
+                        content.type = cellError;
+                        content.val = [NSNumber numberWithInteger:err];
+                        content.str = [NSString stringWithFormat:@"%ld", (long)err];
+                    } else {
+                        content.type = cellString;
+                    }
+            }
+            break;
+        case 0x00FD:	//LABELSST
+        case 0x0204:	//LABEL
+            content.type = cellString;
+            content.val = [NSNumber numberWithLong:cell->l];	// possible numeric conversion done for you
+            break;
+        case 0x0203:	//NUMBER
+        case 0x027E:	//RK
+            content.type = cellFloat;
+            content.val = [NSNumber numberWithDouble:cell->d];
+            break;
+        default:
+            content.type = cellUnknown;
+            break;
     }
 	
 	if(!content.str) {
