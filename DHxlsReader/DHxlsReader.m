@@ -195,7 +195,7 @@
 		}
 	}
 	
-	return content;
+	return nil;
 }
 
 - (DHReaderCell *)cellInWorkSheetIndex:(uint32_t)sheetNum row:(uint16_t)row colStr:(char *)colStr
