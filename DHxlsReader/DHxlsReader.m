@@ -31,7 +31,7 @@
 
 #import "DHxlsReader.h"
 
-#import "DHcell-Private.h"
+#import "DHReaderCell-Private.h"
 #import "xls.h"
 
 #if ! __has_feature(objc_arc)
@@ -44,7 +44,7 @@
 - (void)setWorkBook:(xlsWorkBook *)wb;
 
 - (void)openSheet:(uint32_t)sheetNum;
-- (void)formatContent:(DHcell *)content withCell:(xlsCell *)cell;
+- (void)formatContent:(DHReaderCell *)content withCell:(xlsCell *)cell;
 
 @end
 
@@ -162,9 +162,9 @@
 }
 
 // Random Access
-- (DHcell *)cellInWorkSheetIndex:(uint32_t)sheetNum row:(uint16_t)row col:(uint16_t)col
+- (DHReaderCell *)cellInWorkSheetIndex:(uint32_t)sheetNum row:(uint16_t)row col:(uint16_t)col
 {
-	DHcell *content = [DHcell blankCell];
+	DHReaderCell *content = [DHReaderCell blankCell];
 	
 	assert(row && col);
 
@@ -198,17 +198,17 @@
 	return content;
 }
 
-- (DHcell *)cellInWorkSheetIndex:(uint32_t)sheetNum row:(uint16_t)row colStr:(char *)colStr
+- (DHReaderCell *)cellInWorkSheetIndex:(uint32_t)sheetNum row:(uint16_t)row colStr:(char *)colStr
 {
-	if(strlen(colStr) > 2 || strlen(colStr) == 0) return [DHcell blankCell];
+	if(strlen(colStr) > 2 || strlen(colStr) == 0) return [DHReaderCell blankCell];
 
 	NSInteger col = colStr[0] - 'A';
-	if(col < 0 || col >= 26) return [DHcell blankCell];
+	if(col < 0 || col >= 26) return [DHReaderCell blankCell];
 	char c = colStr[1];
 	if(c) {
 		col *= 26;
 		NSInteger col2 = c - 'A';
-		if(col2 < 0 || col2 >= 26) return [DHcell blankCell];
+		if(col2 < 0 || col2 >= 26) return [DHReaderCell blankCell];
 		col += col2;
 	}
 	col += 1;
@@ -229,9 +229,9 @@
 	}
 }
 
-- (DHcell *)nextCell
+- (DHReaderCell *)nextCell
 {
-	DHcell *content = [DHcell blankCell];
+	DHReaderCell *content = [DHReaderCell blankCell];
 
 	if(!_iterating) return nil;
 	
@@ -259,7 +259,7 @@
 	return content;
 }
 
-- (void)formatContent:(DHcell *)content withCell:(xlsCell *)cell
+- (void)formatContent:(DHReaderCell *)content withCell:(xlsCell *)cell
 {
 	NSUInteger col = cell->col;
 

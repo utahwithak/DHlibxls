@@ -28,15 +28,20 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import "DHcell.h"
+typedef enum { cellBlank=0, cellString, cellInteger, cellFloat, cellBool, cellError, cellUnknown } contentsType;
 
-@interface DHcell ()
-@property (nonatomic, assign, readwrite) contentsType type;
-@property (nonatomic, assign, readwrite) uint16_t row;
-@property (nonatomic, assign, readwrite) char *colStr;			// "A" ... "Z", "AA"..."ZZZ"
-@property (nonatomic, assign, readwrite) uint16_t col;
-@property (nonatomic, strong, readwrite) NSString *str;		// typeof depends on contentsType
-@property (nonatomic, strong, readwrite) NSNumber *val;		// typeof depends on contentsType
+@interface DHReaderCell : NSObject
+@property (nonatomic, assign, readonly) contentsType type;
+@property (nonatomic, assign, readonly) uint16_t row;
+@property (nonatomic, assign, readonly) char *colStr;			// "A" ... "Z", "AA"..."ZZZ"
+@property (nonatomic, assign, readonly) uint16_t col;
+@property (nonatomic, strong, readonly) NSString *str;		// typeof depends on contentsType
+@property (nonatomic, strong, readonly) NSNumber *val;		// typeof depends on contentsType
 
++ (DHReaderCell *)blankCell;
+
+// Debugging
+- (void)show;
+- (NSString *)dump;
 
 @end
