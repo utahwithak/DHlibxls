@@ -259,6 +259,11 @@
 	return content;
 }
 
+bool isInteger(double n)
+{
+    return n-floor(n) < 1e-8;
+}
+
 - (void)formatContent:(DHReaderCell *)content withCell:(xlsCell *)cell
 {
 	NSUInteger col = cell->col;
@@ -304,14 +309,21 @@
             }
             break;
         case 0x00FD:	//LABELSST
-        case 0x0204:	//LABEL
+        case 0x02a04:	//LABEL
             content.type = cellString;
             content.val = [NSNumber numberWithLong:cell->l];	// possible numeric conversion done for you
             break;
         case 0x0203:	//NUMBER
         case 0x027E:	//RK
-            content.type = cellFloat;
-            content.val = [NSNumber numberWithDouble:cell->d];
+            if(isInteger(cell->d)){
+                content.type = cellInteger;
+                content.val = [NSNumber numberWithInt:(int)cell->d];
+            }
+            else{
+                content.type = cellFloat;
+                content.val = [NSNumber numberWithDouble:cell->d];
+
+            }            
             break;
         default:
             content.type = cellUnknown;
